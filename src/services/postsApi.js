@@ -13,6 +13,17 @@ export async function getPosts() {
     return data.data
 }
 
+// Fetch a single blog post using its ID.
+export async function getPostById(id) {
+    const response = await fetch(`${API_URL}/posts/${id}`)
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch the blog post.')
+    }
+
+    return response.json()
+}
+
 // Create a new blog post.
 export async function createPost(postData) {
     const response = await fetch(`${API_URL}/posts`, {

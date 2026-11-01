@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getPosts } from '@/services/postsApi'
+import { Link } from 'react-router-dom'
 import {
     Card,
     CardContent,
@@ -51,42 +52,48 @@ function Home() {
     }
 
     return (
-    <main className="mx-auto max-w-7xl px-6 py-12">
-        <header className="mb-10">
-            <h1 className="text-3xl font-bold tracking-tight">
-                Discover Stories
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-                Explore articles, ideas, and stories from our community.
-            </p>
-        </header>
+        <main className="mx-auto max-w-7xl px-6 py-12">
+            <header className="mb-10">
+                <h1 className="text-3xl font-bold tracking-tight">
+                    Discover Stories
+                </h1>
+                <p className="mt-2 text-muted-foreground">
+                    Explore articles, ideas, and stories from our community.
+                </p>
+            </header>
 
-        {posts?.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {posts.map((post) => (
-                    <Card key={post.id}>
-                        <CardHeader>
-                            <CardTitle>{post.title}</CardTitle>
-                            <CardDescription>
-                                {post.category || 'General'}
-                            </CardDescription>
-                        </CardHeader>
+            {posts?.length > 0 ? (
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {posts.map((post) => (
+                        <Link
+                            key={post.id}
+                            to={`/posts/${post.id}`}
+                            className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                        >
+                            <Card className="h-full transition-shadow hover:shadow-md">
+                                <CardHeader>
+                                    <CardTitle>{post.title}</CardTitle>
+                                    <CardDescription>
+                                        {post.category || 'General'}
+                                    </CardDescription>
+                                </CardHeader>
 
-                        <CardContent>
-                            <p className="line-clamp-3 text-sm text-muted-foreground">
-                                {post.excerpt || post.content}
-                            </p>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        ) : (
-            <p className="py-12 text-center text-muted-foreground">
-                No published posts available yet.
-            </p>
-        )}
-    </main>
-)
+                                <CardContent>
+                                    <p className="line-clamp-3 text-sm text-muted-foreground">
+                                        {post.excerpt || post.content}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+            ) : (
+                <p className="py-12 text-center text-muted-foreground">
+                    No published posts available yet.
+                </p>
+            )}
+        </main>
+    )
 }
 
 export default Home
