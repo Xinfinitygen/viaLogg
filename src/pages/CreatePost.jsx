@@ -23,6 +23,7 @@ function CreatePost() {
         title: '',
         excerpt: '',
         content: '',
+        featuredImage: '',
     })
 
     // Send the new post to the API when the form is submitted.
@@ -93,6 +94,40 @@ function CreatePost() {
                                 rows={3}
                             />
                         </div>
+
+                        {/* Allow users to attach an image using a public image URL. */}
+                        <div className="space-y-2">
+                            <label htmlFor="featuredImage" className="text-sm font-medium">
+                                Featured Image URL
+                            </label>
+
+                            <Input
+                                id="featuredImage"
+                                name="featuredImage"
+                                type="url"
+                                placeholder="https://example.com/image.jpg"
+                                value={formData.featuredImage}
+                                onChange={handleChange}
+                            />
+
+                            <p className="text-xs text-muted-foreground">
+                                Paste a publicly accessible image URL.
+                            </p>
+                        </div>
+
+                        {/* Show users what their selected featured image looks like. */}
+                        {formData.featuredImage && (
+                            <div className="overflow-hidden rounded-lg border">
+                                <img
+                                    src={formData.featuredImage}
+                                    alt="Featured image preview"
+                                    className="h-56 w-full object-cover"
+                                    onError={(event) => {
+                                        event.currentTarget.style.display = 'none'
+                                    }}
+                                />
+                            </div>
+                        )}
 
                         <div className="space-y-2">
                             <label htmlFor="content" className="text-sm font-medium">
