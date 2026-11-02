@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 
+// Displays published posts and provides access to archive actions.
 function Home() {
     const {
         data: posts,
@@ -87,7 +88,7 @@ function Home() {
                             <Card key={post.id} className="h-full transition-shadow hover:shadow-md">
                                 <Link
                                     to={`/posts/${post.id}`}
-                                    className="block rounded-t-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                                    className="group block rounded-t-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
                                 >
                                     <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
                                         {post.featuredImage?.startsWith('https://') ||
@@ -96,7 +97,7 @@ function Home() {
                                                 <img
                                                     src={post.featuredImage}
                                                     alt={post.title}
-                                                    className="h-full w-full object-cover"
+                                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                                                     loading="lazy"
                                                     onError={(event) => {
                                                         event.currentTarget.hidden = true
@@ -106,7 +107,7 @@ function Home() {
 
                                                 <div
                                                     hidden
-                                                    className="flex h-full items-center justify-center"
+                                                    className="flex h-full items-center justify-center bg-linear-to-br from-muted via-muted/80 to-primary/10"
                                                 >
                                                     <span className="text-sm font-medium text-muted-foreground">
                                                         ViaLogg
@@ -123,13 +124,15 @@ function Home() {
                                     </div>
 
                                     <CardHeader>
-                                        <CardTitle>{post.title}</CardTitle>
+                                        <CardTitle className="line-clamp-2">
+                                            {post.title}
+                                        </CardTitle>
 
-                                        <CardDescription>
+                                        <CardDescription className="mt-2 w-fit rounded-full bg-muted px-3 py-1 text-xs font-medium">
                                             {post.category || 'General'}
                                         </CardDescription>
 
-                                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                                             <span>
                                                 By {post.author?.name || 'Anonymous'}
                                             </span>
@@ -150,7 +153,7 @@ function Home() {
                                     </CardHeader>
 
                                     <CardContent>
-                                        <p className="line-clamp-3 text-sm text-muted-foreground">
+                                        <p className="line-clamp-3 min-h-18 text-sm leading-relaxed text-muted-foreground">
                                             {post.excerpt || post.content}
                                         </p>
                                     </CardContent>
