@@ -18,6 +18,13 @@ function Navigation() {
                         Home
                     </NavLink>
 
+                    <NavLink
+                        to="/archive"
+                        className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                    >
+                        Archive
+                    </NavLink>
+
                     <Button
                         nativeButton={false}
                         render={<Link to="/create" />}

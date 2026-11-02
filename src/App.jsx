@@ -6,6 +6,7 @@ const PostDetails = lazy(() => import('./pages/PostDetails'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const TanStackDemo = lazy(() => import('./components/TanStackDemo'))
+const Archive = lazy(() => import('./pages/Archive'))
 import Navigation from './components/Navigation'
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/create" element={<CreatePost />} />
           <Route path="/tanstack-demo" element={<TanStackDemo />} />
+          <Route path="/archive" element={<Archive />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
