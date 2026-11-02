@@ -4,6 +4,7 @@ import { lazy, Suspense } from 'react'
 const Home = lazy(() => import('./pages/Home'))
 const PostDetails = lazy(() => import('./pages/PostDetails'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 import Navigation from './components/Navigation'
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/create" element={<CreatePost />} />
-          <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
