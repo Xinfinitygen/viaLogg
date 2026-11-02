@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { getPosts } from '@/services/postsApi'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getPosts, updatePost } from '@/services/postsApi'
+import { Button } from '@/components/ui/button'
 import { Link } from 'react-router-dom'
 import {
     Card,
@@ -19,6 +20,21 @@ function Home() {
     } = useQuery({
         queryKey: ['posts'],
         queryFn: getPosts,
+    })
+
+    const queryClient = useQueryClient()
+
+    // Move a published post into the archive.
+    const archiveMutation = useMutation({
+        mutationFn: (id) => updatePost(id, { status: 'ARCHIVED' }),
+
+        // Refresh Home and Archive so the post moves between the two pages.
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: ['posts'] }),
+                queryClient.invalidateQueries({ queryKey: ['archivedPosts'] }),
+            ])
+        },
     })
 
     if (isLoading) {
@@ -62,90 +78,113 @@ function Home() {
                 </p>
             </header>
 
+
             {posts?.length > 0 ? (
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {posts.map((post) => (
-                        <Link
-                            key={post.id}
-                            to={`/posts/${post.id}`}
-                            className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
-                        >
-                            <Card className="h-full transition-shadow hover:shadow-md">
+                <>
+                    {/* Display all published posts in a responsive grid. */}
+                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {posts.map((post) => (
+                            <Card key={post.id} className="h-full transition-shadow hover:shadow-md">
+                                <Link
+                                    to={`/posts/${post.id}`}
+                                    className="block rounded-t-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+                                >
+                                    <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
+                                        {post.featuredImage?.startsWith('https://') ||
+                                            post.featuredImage?.startsWith('http://') ? (
+                                            <>
+                                                <img
+                                                    src={post.featuredImage}
+                                                    alt={post.title}
+                                                    className="h-full w-full object-cover"
+                                                    loading="lazy"
+                                                    onError={(event) => {
+                                                        event.currentTarget.hidden = true
+                                                        event.currentTarget.nextElementSibling.hidden = false
+                                                    }}
+                                                />
 
-                                <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
-                                    {post.featuredImage?.startsWith('https://') ||
-                                        post.featuredImage?.startsWith('http://') ? (
-                                        <>
-                                            <img
-                                                src={post.featuredImage}
-                                                alt={post.title}
-                                                className="h-full w-full object-cover"
-                                                loading="lazy"
-                                                onError={(event) => {
-                                                    event.currentTarget.hidden = true
-                                                    event.currentTarget.nextElementSibling.hidden = false
-                                                }}
-                                            />
-
-                                            <div
-                                                hidden
-                                                className="flex h-full items-center justify-center"
-                                            >
+                                                <div
+                                                    hidden
+                                                    className="flex h-full items-center justify-center"
+                                                >
+                                                    <span className="text-sm font-medium text-muted-foreground">
+                                                        ViaLogg
+                                                    </span>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="flex h-full items-center justify-center">
                                                 <span className="text-sm font-medium text-muted-foreground">
                                                     ViaLogg
                                                 </span>
                                             </div>
-                                        </>
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center">
-                                            <span className="text-sm font-medium text-muted-foreground">
-                                                ViaLogg
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-                                <CardHeader>
-                                    <CardTitle>{post.title}</CardTitle>
-
-                                    <CardDescription>
-                                        {post.category || 'General'}
-                                    </CardDescription>
-
-                                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                                        <span>
-                                            By {post.author?.name || 'Anonymous'}
-                                        </span>
-
-                                        {post.publishedAt && (
-                                            <>
-                                                <span aria-hidden="true">•</span>
-                                                <time dateTime={post.publishedAt}>
-                                                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                                                        year: 'numeric',
-                                                        month: 'short',
-                                                        day: 'numeric',
-                                                    })}
-                                                </time>
-                                            </>
                                         )}
                                     </div>
-                                </CardHeader>
 
-                                <CardContent>
-                                    <p className="line-clamp-3 text-sm text-muted-foreground">
-                                        {post.excerpt || post.content}
-                                    </p>
-                                </CardContent>
+                                    <CardHeader>
+                                        <CardTitle>{post.title}</CardTitle>
+
+                                        <CardDescription>
+                                            {post.category || 'General'}
+                                        </CardDescription>
+
+                                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                            <span>
+                                                By {post.author?.name || 'Anonymous'}
+                                            </span>
+
+                                            {post.publishedAt && (
+                                                <>
+                                                    <span aria-hidden="true">•</span>
+                                                    <time dateTime={post.publishedAt}>
+                                                        {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                                                            year: 'numeric',
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                        })}
+                                                    </time>
+                                                </>
+                                            )}
+                                        </div>
+                                    </CardHeader>
+
+                                    <CardContent>
+                                        <p className="line-clamp-3 text-sm text-muted-foreground">
+                                            {post.excerpt || post.content}
+                                        </p>
+                                    </CardContent>
+                                </Link>
+
+                                {/* Keep the archive action separate from the post link. */}
+                                <div className="px-6 pb-6">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        disabled={archiveMutation.isPending}
+                                        onClick={() => archiveMutation.mutate(post.id)}
+                                    >
+                                        Archive
+                                    </Button>
+                                </div>
                             </Card>
-                        </Link>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+
+                    {/* Show an error if the API cannot archive a post. */}
+                    {archiveMutation.isError && (
+                        <p className="mt-4 text-sm text-destructive">
+                            {archiveMutation.error?.message || 'Failed to archive this post.'}
+                        </p>
+                    )}
+                </>
             ) : (
                 <p className="py-12 text-center text-muted-foreground">
                     No published posts available yet.
                 </p>
             )}
-        </main>
+
+        </main >
     )
 }
 
