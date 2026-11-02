@@ -71,11 +71,49 @@ function Home() {
                             className="block rounded-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
                         >
                             <Card className="h-full transition-shadow hover:shadow-md">
+
+                                <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
+                                    {post.featuredImage?.startsWith('https://') ||
+                                        post.featuredImage?.startsWith('http://') ? (
+                                        <img
+                                            src={post.featuredImage}
+                                            alt={post.title}
+                                            className="h-full w-full object-cover"
+                                            loading="lazy"
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center">
+                                            <span className="text-sm font-medium text-muted-foreground">
+                                                ViaLogg
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
                                 <CardHeader>
                                     <CardTitle>{post.title}</CardTitle>
+
                                     <CardDescription>
                                         {post.category || 'General'}
                                     </CardDescription>
+
+                                    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                        <span>
+                                            By {post.author?.name || 'Anonymous'}
+                                        </span>
+
+                                        {post.publishedAt && (
+                                            <>
+                                                <span aria-hidden="true">•</span>
+                                                <time dateTime={post.publishedAt}>
+                                                    {new Date(post.publishedAt).toLocaleDateString('en-US', {
+                                                        year: 'numeric',
+                                                        month: 'short',
+                                                        day: 'numeric',
+                                                    })}
+                                                </time>
+                                            </>
+                                        )}
+                                    </div>
                                 </CardHeader>
 
                                 <CardContent>
