@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
+// Displays archived posts and lets users restore or permanently delete them.
 function Archive() {
     const queryClient = useQueryClient()
 
@@ -60,6 +61,7 @@ function Archive() {
 
     if (isLoading) {
         return (
+            // Show placeholder cards while archived posts are loading.
             <section className="mx-auto max-w-7xl px-6 py-12">
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {Array.from({ length: 3 }).map((_, index) => (
@@ -79,6 +81,7 @@ function Archive() {
     }
 
     if (isError) {
+        // Show an error message if the archive request fails.
         return (
             <section className="mx-auto max-w-7xl px-6 py-12">
                 <p className="text-center text-destructive">
@@ -102,11 +105,16 @@ function Archive() {
             {posts?.length > 0 ? (
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {posts.map((post) => (
+                        // Each card represents one archived post.
                         <Card key={post.id} className="h-full">
+
+                            {/* Clicking the post content opens its details page. */}
                             <Link
                                 to={`/posts/${post.id}`}
                                 className="block rounded-t-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                             >
+
+                                {/* Display the featured image or ViaLogg fallback. */}
                                 <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
                                     {post.featuredImage?.startsWith('https://') ||
                                         post.featuredImage?.startsWith('http://') ? (
@@ -139,6 +147,7 @@ function Archive() {
                                     )}
                                 </div>
 
+                                {/* Show the post title, category, and archive status. */}
                                 <CardHeader>
                                     <CardTitle>{post.title}</CardTitle>
                                     <CardDescription>
@@ -149,6 +158,7 @@ function Archive() {
                                     </p>
                                 </CardHeader>
 
+                                {/* Display a short preview of the archived post. */}
                                 <CardContent>
                                     <p className="line-clamp-3 text-sm text-muted-foreground">
                                         {post.excerpt || post.content}
@@ -156,7 +166,10 @@ function Archive() {
                                 </CardContent>
                             </Link>
 
+                            {/* Keep restore and permanent deletion actions outside the post link. */}
                             <div className="flex flex-wrap gap-2 px-6 pb-6">
+
+                                {/* Return this post to the published posts list. */}
                                 <Button
                                     size="sm"
                                     disabled={restoreMutation.isPending}
@@ -165,6 +178,7 @@ function Archive() {
                                     Restore
                                 </Button>
 
+                                {/* Permanently remove this post after confirmation. */}
                                 <Button
                                     size="sm"
                                     variant="destructive"
@@ -178,6 +192,7 @@ function Archive() {
                     ))}
                 </div>
             ) : (
+                // {/* Let users know when there are no archived posts. */}
                 <p className="py-12 text-center text-muted-foreground">
                     Your archive is empty.
                 </p>
