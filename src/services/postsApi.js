@@ -40,3 +40,46 @@ export async function createPost(postData) {
 
     return response.json()
 }
+
+// Fetch posts that have been moved to the archive.
+export async function getArchivedPosts() {
+    const response = await fetch(`${API_URL}/posts?status=ARCHIVED`)
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch archived posts.')
+    }
+
+    const data = await response.json()
+
+    return data.data
+}
+
+// Update a post, including its publication status.
+export async function updatePost(id, postData) {
+    const response = await fetch(`${API_URL}/posts/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to update the blog post.')
+    }
+
+    return response.json()
+}
+
+// Permanently delete a post.
+export async function deletePost(id) {
+    const response = await fetch(`${API_URL}/posts/${id}`, {
+        method: 'DELETE',
+    })
+
+    if (!response.ok) {
+        throw new Error('Failed to delete the blog post.')
+    }
+
+    return response.json()
+}
