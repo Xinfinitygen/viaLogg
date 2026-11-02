@@ -5,6 +5,7 @@ const Home = lazy(() => import('./pages/Home'))
 const PostDetails = lazy(() => import('./pages/PostDetails'))
 const CreatePost = lazy(() => import('./pages/CreatePost'))
 const NotFound = lazy(() => import('./pages/NotFound'))
+const TanStackDemo = lazy(() => import('./components/TanStackDemo'))
 import Navigation from './components/Navigation'
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/create" element={<CreatePost />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/tanstack-demo" element={<TanStackDemo />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
