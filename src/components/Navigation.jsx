@@ -18,8 +18,11 @@ function Navigation() {
                         Home
                     </NavLink>
 
-                    <Button asChild>
-                        <Link to="/create">Create Post</Link>
+                    <Button
+                        nativeButton={false}
+                        render={<Link to="/create" />}
+                    >
+                        Create Post
                     </Button>
                 </div>
             </div>
