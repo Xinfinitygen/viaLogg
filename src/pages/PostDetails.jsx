@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { getPostById } from '@/services/postsApi'
 import {
     Card,
@@ -10,9 +10,13 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
+// Displays the full details of a selected blog post.
 function PostDetails() {
     // Get the post ID from the URL.
     const { id } = useParams()
+
+    // Allow users to navigate to their previous page.
+    const navigate = useNavigate()
 
     // Fetch the selected post.
     const {
@@ -35,11 +39,19 @@ function PostDetails() {
                 <p className="text-center text-destructive">
                     {error.message || 'Unable to load this post.'}
                 </p>
-                <div className="mt-6 text-center">
+                <div className="mb-8 flex flex-wrap gap-3">
+                    {/* Return users to the page they visited previously. */}
+                    <Button
+                        variant="outline"
+                        onClick={() => navigate(-1)}
+                    >
+                        ← Go Back
+                    </Button>
+
+                    {/* Provide a direct route back to the Home page. */}
                     <Button asChild variant="outline">
                         <Link to="/">Back to Home</Link>
                     </Button>
-
                 </div>
 
             </section>
