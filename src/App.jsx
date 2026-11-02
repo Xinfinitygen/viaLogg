@@ -16,8 +16,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/posts/:id" element={<PostDetails />} />
           <Route path="/create" element={<CreatePost />} />
-          <Route path="*" element={<NotFound />} />
           <Route path="/tanstack-demo" element={<TanStackDemo />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

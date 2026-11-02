@@ -75,12 +75,27 @@ function Home() {
                                 <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
                                     {post.featuredImage?.startsWith('https://') ||
                                         post.featuredImage?.startsWith('http://') ? (
-                                        <img
-                                            src={post.featuredImage}
-                                            alt={post.title}
-                                            className="h-full w-full object-cover"
-                                            loading="lazy"
-                                        />
+                                        <>
+                                            <img
+                                                src={post.featuredImage}
+                                                alt={post.title}
+                                                className="h-full w-full object-cover"
+                                                loading="lazy"
+                                                onError={(event) => {
+                                                    event.currentTarget.hidden = true
+                                                    event.currentTarget.nextElementSibling.hidden = false
+                                                }}
+                                            />
+
+                                            <div
+                                                hidden
+                                                className="flex h-full items-center justify-center"
+                                            >
+                                                <span className="text-sm font-medium text-muted-foreground">
+                                                    ViaLogg
+                                                </span>
+                                            </div>
+                                        </>
                                     ) : (
                                         <div className="flex h-full items-center justify-center">
                                             <span className="text-sm font-medium text-muted-foreground">
