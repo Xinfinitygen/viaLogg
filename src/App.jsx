@@ -7,21 +7,24 @@ const CreatePost = lazy(() => import('./pages/CreatePost'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const TanStackDemo = lazy(() => import('./components/TanStackDemo'))
 const Archive = lazy(() => import('./pages/Archive'))
+import ErrorBoundary from './components/ErrorBoundary'
 import Navigation from './components/Navigation'
 function App() {
   return (
     <BrowserRouter>
-      <Navigation />
-      <Suspense fallback={<p className="py-20 text-center">Loading page...</p>}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/posts/:id" element={<PostDetails />} />
-          <Route path="/create" element={<CreatePost />} />
-          <Route path="/tanstack-demo" element={<TanStackDemo />} />
-          <Route path="/archive" element={<Archive />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
+      <ErrorBoundary>
+        <Navigation />
+        <Suspense fallback={<p className="py-20 text-center">Loading page...</p>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/posts/:id" element={<PostDetails />} />
+            <Route path="/create" element={<CreatePost />} />
+            <Route path="/tanstack-demo" element={<TanStackDemo />} />
+            <Route path="/archive" element={<Archive />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
     </BrowserRouter>
   )
 }

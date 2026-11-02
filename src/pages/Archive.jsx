@@ -12,11 +12,14 @@ import {
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 
+// Keep track of default posts hidden after a deletion attempt.
+const DELETED_POSTS_KEY = 'vialogg_deleted_posts'
+
 // Displays archived posts and lets users restore or permanently delete them.
 function Archive() {
     const queryClient = useQueryClient()
 
-    // Fetch all posts currently in the archive.
+    // Fetch archived posts and exclude posts already deleted in this browser.
     const {
         data: posts,
         isLoading,
@@ -24,7 +27,18 @@ function Archive() {
         error,
     } = useQuery({
         queryKey: ['archivedPosts'],
-        queryFn: getArchivedPosts,
+        queryFn: async () => {
+            const archivedPosts = await getArchivedPosts()
+
+            // Exclude posts previously marked as deleted in this browser.
+            const deletedIds = JSON.parse(
+                localStorage.getItem(DELETED_POSTS_KEY) || '[]'
+            )
+
+            return archivedPosts.filter(
+                (post) => !deletedIds.includes(String(post.id))
+            )
+        },
     })
 
     // Restore a post by changing its status back to PUBLISHED.
@@ -38,10 +52,34 @@ function Archive() {
         },
     })
 
-    // Permanently delete a post after the user confirms.
+    // Delete a post and remember its ID locally to keep it hidden.
     const deleteMutation = useMutation({
         mutationFn: deletePost,
-        onSuccess: async () => {
+        onSuccess: async (_, deletedPostId) => {
+            const deletedId = String(deletedPostId)
+
+            // Save the deleted post ID so it stays hidden after refreshing.
+            const deletedIds = JSON.parse(
+                localStorage.getItem(DELETED_POSTS_KEY) || '[]'
+            )
+
+            if (!deletedIds.includes(deletedId)) {
+                deletedIds.push(deletedId)
+
+                localStorage.setItem(
+                    DELETED_POSTS_KEY,
+                    JSON.stringify(deletedIds)
+                )
+            }
+
+            // Immediately remove the card from the displayed archive.
+            queryClient.setQueryData(['archivedPosts'], (previousPosts) =>
+                previousPosts?.filter(
+                    (post) => String(post.id) !== deletedId
+                )
+            )
+
+            // Refresh both lists to keep the displayed data synchronized.
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: ['archivedPosts'] }),
                 queryClient.invalidateQueries({ queryKey: ['posts'] }),
@@ -49,6 +87,7 @@ function Archive() {
         },
     })
 
+    // Ask for confirmation before permanently deleting a post.
     function handleDelete(id) {
         const confirmed = window.confirm(
             'Are you sure you want to permanently delete this post? This action cannot be undone.'
@@ -85,7 +124,8 @@ function Archive() {
         return (
             <section className="mx-auto max-w-7xl px-6 py-12">
                 <p className="text-center text-destructive">
-                    {error?.message || 'Something went wrong while loading archived posts.'}
+                    {error?.message ||
+                        'Something went wrong while loading archived posts.'}
                 </p>
             </section>
         )
@@ -98,7 +138,8 @@ function Archive() {
                     Archive
                 </h1>
                 <p className="mt-2 text-muted-foreground">
-                    Manage your archived stories. Restore them or permanently delete them.
+                    Manage your archived stories. Restore them or permanently
+                    delete them.
                 </p>
             </header>
 
@@ -107,17 +148,15 @@ function Archive() {
                     {posts.map((post) => (
                         // Each card represents one archived post.
                         <Card key={post.id} className="h-full">
-
                             {/* Clicking the post content opens its details page. */}
                             <Link
                                 to={`/posts/${post.id}`}
                                 className="block rounded-t-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                             >
-
                                 {/* Display the featured image or ViaLogg fallback. */}
                                 <div className="aspect-video overflow-hidden rounded-t-xl bg-muted">
                                     {post.featuredImage?.startsWith('https://') ||
-                                        post.featuredImage?.startsWith('http://') ? (
+                                    post.featuredImage?.startsWith('http://') ? (
                                         <>
                                             <img
                                                 src={post.featuredImage}
@@ -168,7 +207,6 @@ function Archive() {
 
                             {/* Keep restore and permanent deletion actions outside the post link. */}
                             <div className="flex flex-wrap gap-2 px-6 pb-6">
-
                                 {/* Return this post to the published posts list. */}
                                 <Button
                                     size="sm"
@@ -192,7 +230,7 @@ function Archive() {
                     ))}
                 </div>
             ) : (
-                // {/* Let users know when there are no archived posts. */}
+                // Let users know when there are no archived posts.
                 <p className="py-12 text-center text-muted-foreground">
                     Your archive is empty.
                 </p>
@@ -200,7 +238,8 @@ function Archive() {
 
             {(restoreMutation.isError || deleteMutation.isError) && (
                 <p className="mt-6 text-center text-sm text-destructive">
-                    {restoreMutation.error?.message || deleteMutation.error?.message}
+                    {restoreMutation.error?.message ||
+                        deleteMutation.error?.message}
                 </p>
             )}
         </main>
